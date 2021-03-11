@@ -25,7 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class MainActivity extends AppCompatActivity {
-
+    //KOMENTARZ XDD
     SignInButton btSignIn;
     GoogleSignInClient googleSignInClient;
     FirebaseAuth firebaseAuth;
