@@ -46,7 +46,6 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
@@ -57,7 +56,7 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
 
         //get data from base
 
-        reference = FirebaseDatabase.getInstance().getReference().child("ToDo");
+        reference = FirebaseDatabase.getInstance().getReference().child("ToDo"+userID);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -65,7 +64,6 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
                 {
                     MyDoes p = dataSnapshot1.getValue(MyDoes.class);
                     list.add(p);
-
                 }
                 doesAdapter = new DoesAdapter(ProfileActivity.this, list);
                 ourdoes.setAdapter(doesAdapter);
@@ -79,14 +77,13 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
         });
 
 
-
-
-
+//      Przycisk przejscia do dodawania taskow
         addButton = findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openAddActivity();
+                Intent goToAdd = new Intent(ProfileActivity.this,AddActivity.class);
+                startActivity(goToAdd);
             }
         });
 
@@ -99,8 +96,8 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
         }
 
         googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
+//        wylogowywanie sie
         logoutButton = findViewById(R.id.logoutButton);
-
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,20 +105,17 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
+                            Intent backToMain = new Intent(ProfileActivity.this,MainActivity.class);
+                            startActivity(backToMain);
                             firebaseAuth.signOut();
                             Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
                             finish();
+
                         }
                     }
                 });
             }
         });
-    }
-
-
-    public void openAddActivity(){
-        Intent intent = new Intent(this,AddActivity.class);
-        startActivity(intent);
     }
 
     public void showPopup(View v){

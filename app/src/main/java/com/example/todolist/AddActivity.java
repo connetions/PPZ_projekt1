@@ -24,16 +24,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Calendar;
 import java.util.Random;
 
-public class AddActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class AddActivity extends AppCompatActivity  {
 
-    private TextView dateView;
-    private TextView timeView;
+    private TextView dateView , timeView;
     EditText taskEdit;
-    Button buttonAddTask;
+    Button buttonAddTask, dateButton, timeButton;
     DatabaseReference reference;
     String doesID = new ProfileActivity().userID;
     Integer doesNumber = new Random().nextInt();
-    String dateSet, timeSet;
     Context mContext = this;
 
     @Override
@@ -43,20 +41,37 @@ public class AddActivity extends AppCompatActivity implements DatePickerDialog.O
 
         dateView = findViewById(R.id.dateView);
         timeView = findViewById(R.id.timeView);
+        taskEdit = findViewById(R.id.taskEdit);
 
+//      Inicjalizowanie zmiennych do kalendarza i czasu
         Calendar calendar = Calendar.getInstance();
-
         final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int minute = calendar.get(Calendar.MINUTE);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int month = calendar.get(Calendar.MONTH);
+        final int year = calendar.get(Calendar.YEAR);
 
-        findViewById(R.id.dateButton).setOnClickListener(new View.OnClickListener() {
+
+        // datePicker okodowany
+        dateButton = findViewById(R.id.dateButton);
+        dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePickerDailog();
+                DatePickerDialog datePickerDialog;
+                datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        String date = "Month / Day / YEAR:" + month + "/" + dayOfMonth + "/" + year;
+                        dateView.setText(date);
+                    }
+                },year,month,day);
+                datePickerDialog.show();
             }
         });
 
-        findViewById(R.id.timeButton).setOnClickListener(new View.OnClickListener() {
+//        time picker okodowany
+        timeButton = findViewById(R.id.timeButton);
+        timeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerDialog timePickerDialog;
@@ -64,26 +79,28 @@ public class AddActivity extends AppCompatActivity implements DatePickerDialog.O
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         timeView.setText((hourOfDay + ":" + minute));
-                        timeSet = hourOfDay + ":" + minute;
                     }
-                },hour, minute,android.text.format.DateFormat.is24HourFormat(mContext));
+                },hour, minute,true);
                 timePickerDialog.show();
             }
         });
 
-
-        findViewById(R.id.buttonAddTask).setOnClickListener(new View.OnClickListener() {
+//        Dodawanie do bazy
+        buttonAddTask = findViewById(R.id.buttonAddTask);
+        buttonAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reference = FirebaseDatabase.getInstance().getReference().child("ToDo").child("Does" + doesNumber);
+//                nazwa bazki + ID usera i podrzewa does + losowy numer taska
+                reference = FirebaseDatabase.getInstance().getReference().child("ToDo"+doesID).child("Does" + doesNumber);
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.getRef().child("titledoes").setValue("XD");
-                        snapshot.getRef().child("descdoes").setValue("taskEdit.getText().toString()");
-                        snapshot.getRef().child("datedoes").setValue("taskEdit.getText().toString()");
-                        Intent a = new Intent(AddActivity.this,ProfileActivity.class);
-                        startActivity(a);
+                        snapshot.getRef().child("titledoes").setValue(taskEdit.getText().toString());
+                        snapshot.getRef().child("descdoes").setValue(dateView.getText());
+                        snapshot.getRef().child("datedoes").setValue(timeView.getText());
+
+                        Intent backToProfile = new Intent(AddActivity.this,ProfileActivity.class);
+                        startActivity(backToProfile);
                     }
 
                     @Override
@@ -96,20 +113,4 @@ public class AddActivity extends AppCompatActivity implements DatePickerDialog.O
         });
     }
 
-
-    private void showDatePickerDailog(){
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,this, Calendar.getInstance().get(Calendar.YEAR),
-                Calendar.getInstance().get(Calendar.MONTH),
-                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-        );
-        datePickerDialog.show();
-    }
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        String date = "month/day/year:" + month + "/" + dayOfMonth + "/" + year;
-        dateSet = date;
-        dateView.setText(date);
-    }
 }
