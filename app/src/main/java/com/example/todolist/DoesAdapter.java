@@ -19,7 +19,6 @@ public class DoesAdapter extends RecyclerView.Adapter<DoesAdapter.MyViewHolder> 
     public DoesAdapter(Context c, ArrayList<MyDoes> p){
         context = c;
         myDoes = p;
-
     }
 
     @NonNull

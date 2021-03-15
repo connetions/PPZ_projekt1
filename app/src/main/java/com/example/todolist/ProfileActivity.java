@@ -41,6 +41,8 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
     ArrayList<MyDoes> list;
     DoesAdapter doesAdapter;
 
+    public String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
