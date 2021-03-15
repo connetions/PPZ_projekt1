@@ -79,9 +79,9 @@ public class AddActivity extends AppCompatActivity implements DatePickerDialog.O
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.getRef().child("tittleDoes").setValue("XD");
-                        snapshot.getRef().child("descDoes").setValue("taskEdit.getText().toString()");
-                        snapshot.getRef().child("dataDoes").setValue("taskEdit.getText().toString()");
+                        snapshot.getRef().child("titledoes").setValue("XD");
+                        snapshot.getRef().child("descdoes").setValue("taskEdit.getText().toString()");
+                        snapshot.getRef().child("datedoes").setValue("taskEdit.getText().toString()");
                         Intent a = new Intent(AddActivity.this,ProfileActivity.class);
                         startActivity(a);
                     }
