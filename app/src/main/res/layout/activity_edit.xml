@@ -113,15 +113,26 @@
         app:layout_constraintTop_toBottomOf="@+id/categoryView" />
 
     <Button
-        android:id="@+id/addButton"
+        android:id="@+id/updateButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:background="@drawable/bc_btn_add"
 
         android:layout_marginBottom="4dp"
-        android:text="@string/buttonAddTask"
+        android:text="upp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline_left" />
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bc_btn_add"
+        android:text="del"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline_right" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_left"

@@ -14,7 +14,10 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,34 +27,88 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Calendar;
 import java.util.Random;
 
-public class AddActivity extends AppCompatActivity  {
+public class EditActivity extends AppCompatActivity {
 
-    TextView dateView , timeView;
+    private TextView dateView , timeView;
     EditText taskEdit, categoryEdit;
-    Button addButton, dateButton, timeButton;
+    Button updateButton, deleteButton, dateButton, timeButton;
     DatabaseReference reference;
-//    String doesID = new ProfileActivity().userID;
 
     Context mContext = this;
-    String keyTask = Integer.toString(new Random().nextInt());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add);
+        setContentView(R.layout.activity_edit);
 
         dateView = findViewById(R.id.dateView);
         timeView = findViewById(R.id.timeView);
         taskEdit = findViewById(R.id.taskEdit);
         categoryEdit = findViewById(R.id.categoryEdit);
 
-//      Inicjalizowanie zmiennych do kalendarza i czasu
+        deleteButton = findViewById(R.id.deleteButton);
+        updateButton = findViewById(R.id.updateButton);
+
+        taskEdit.setText(getIntent().getStringExtra("titleTask"));
+        timeView.setText(getIntent().getStringExtra("timeTask"));
+        dateView.setText(getIntent().getStringExtra("dateTask"));
+        categoryEdit.setText(getIntent().getStringExtra("categoryTask"));
+
+        final String keykeyDoes = getIntent().getStringExtra("keyTask");
+        final String keykeyID = getIntent().getStringExtra("userID");
+
+        reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + keykeyID).child(getIntent().getStringExtra("categoryTask")).child("Does" + keykeyDoes);
+
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().child("titleTask").setValue(taskEdit.getText().toString());
+                        snapshot.getRef().child("dateTask").setValue(dateView.getText());
+                        snapshot.getRef().child("timeTask").setValue(timeView.getText());
+                        snapshot.getRef().child("categoryTask").setValue(timeView.getText().toString());
+
+                        Intent backToProfile = new Intent(EditActivity.this, ProfileActivity.class);
+                        startActivity(backToProfile);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Intent goToProfile = new Intent(EditActivity.this, ProfileActivity.class);
+                            startActivity(goToProfile);
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(),"Error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+
+
         Calendar calendar = Calendar.getInstance();
         final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int minute = calendar.get(Calendar.MINUTE);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
         final int month = calendar.get(Calendar.MONTH);
         final int year = calendar.get(Calendar.YEAR);
+
 
         // datePicker okodowany
         dateButton = findViewById(R.id.dateButton);
@@ -85,40 +142,5 @@ public class AddActivity extends AppCompatActivity  {
                 timePickerDialog.show();
             }
         });
-
-//        Dodawanie do bazy
-
-        final String userID = getIntent().getStringExtra("keyID");
-
-        addButton = findViewById(R.id.addButton);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                nazwa bazki + ID usera i podrzewa does + losowy numer taska
-
-
-                reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(categoryEdit.getText().toString()).child("Does" + keyTask);
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.getRef().child("titleTask").setValue(taskEdit.getText().toString());
-                        snapshot.getRef().child("dateTask").setValue(dateView.getText());
-                        snapshot.getRef().child("timeTask").setValue(timeView.getText());
-                        snapshot.getRef().child("categoryTask").setValue(categoryEdit.getText().toString());
-                        snapshot.getRef().child("keyTask").setValue(keyTask);
-                        snapshot.getRef().child("userID").setValue(userID);
-
-
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
-
-                Intent backToProfile = new Intent(AddActivity.this,ProfileActivity.class);
-                startActivity(backToProfile);
-            }
-        });
     }
-
 }

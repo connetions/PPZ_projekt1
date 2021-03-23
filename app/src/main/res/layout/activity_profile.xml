@@ -27,7 +27,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/includeAppBar"
         app:layout_constraintEnd_toStartOf="@+id/logoutButton"
-        app:layout_constraintStart_toEndOf="@+id/listButton"
+        app:layout_constraintStart_toEndOf="@+id/categorySpinner"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
@@ -43,16 +43,14 @@
         tools:ignore="MissingConstraints" />
 
 
-    
-    <Button
-        android:id="@+id/listButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <Spinner
+        android:id="@+id/categorySpinner"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
-        android:background="@drawable/bc_btn_appbar"
-        android:onClick="showPopup"
-        android:text="Kategoria"
+        android:spinnerMode="dropdown"
+        android:background="@drawable/bc_spinner"
         app:layout_constraintBottom_toBottomOf="@+id/includeAppBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/includeAppBar" />
@@ -83,5 +81,8 @@
         android:text="@string/add_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

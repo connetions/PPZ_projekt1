@@ -9,8 +9,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,20 +31,28 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class ProfileActivity extends AppCompatActivity  {
 
     TextView userView;
     Button logoutButton, addButton;
     FirebaseAuth firebaseAuth;
     GoogleSignInClient googleSignInClient;
 
-    DatabaseReference reference;
+    DatabaseReference reference, spinnerReference;
     RecyclerView ourdoes;
     ArrayList<MyDoes> list;
     DoesAdapter doesAdapter;
 
+    Spinner spinner;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> spinerData;
+    ValueEventListener listener;
+    String categoryName = "Wszystkie";
+
     public String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
 
 
     @Override
@@ -49,32 +60,51 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        //working with data
-        ourdoes = findViewById(R.id.ourdoes);
-        ourdoes.setLayoutManager(new LinearLayoutManager(this));
-        list = new ArrayList<MyDoes>();
+        spinner=findViewById(R.id.categorySpinner);
 
-        //get data from base
+        spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
+        spinerData = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(ProfileActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
 
-        reference = FirebaseDatabase.getInstance().getReference().child("ToDo"+userID);
-        reference.addValueEventListener(new ValueEventListener() {
+//        spinner.setAdapter(adapter);
+//        retrievData();
+
+
+        listener = spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren())
-                {
-                    MyDoes p = dataSnapshot1.getValue(MyDoes.class);
-                    list.add(p);
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot snapshot1: snapshot.getChildren()) {
+                    spinerData.add(snapshot1.getKey());
                 }
-                doesAdapter = new DoesAdapter(ProfileActivity.this, list);
-                ourdoes.setAdapter(doesAdapter);
-                doesAdapter.notifyDataSetChanged();
+                adapter = new ArrayAdapter<String>(ProfileActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
+                spinner.setAdapter(adapter);
+
+
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "No Data", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                
+                categoryName = parent.getItemAtPosition(position).toString();
+
+                fetchData();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
 
 
 //      Przycisk przejscia do dodawania taskow
@@ -83,6 +113,7 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
             @Override
             public void onClick(View v) {
                 Intent goToAdd = new Intent(ProfileActivity.this,AddActivity.class);
+                goToAdd.putExtra("keyID", userID);
                 startActivity(goToAdd);
             }
         });
@@ -116,34 +147,58 @@ public class ProfileActivity extends AppCompatActivity implements PopupMenu.OnMe
                 });
             }
         });
+
+
+    }
+    public void fetchData(){
+        ourdoes = findViewById(R.id.ourdoes);
+        ourdoes.setLayoutManager(new LinearLayoutManager(this));
+        ourdoes.setHasFixedSize(true);
+        list = new ArrayList<MyDoes>();
+
+        //get data from base
+
+        reference = FirebaseDatabase.getInstance().getReference().child("ToDo"+userID).child(categoryName);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren())
+                {
+                    MyDoes p = dataSnapshot1.getValue(MyDoes.class);
+                    list.add(p);
+                }
+                doesAdapter = new DoesAdapter(ProfileActivity.this, list);
+                ourdoes.setAdapter(doesAdapter);
+                doesAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(), "No Data", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    public void showPopup(View v){
-        PopupMenu popup = new PopupMenu(this, v);
-        popup.setOnMenuItemClickListener(this);
-        popup.inflate(R.menu.popup_menu);
-        popup.show();
-    }
 
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.item1:
-                Toast.makeText(this, "item 1 click", Toast.LENGTH_LONG).show();
-                return true;
-            case R.id.item2:
-                Toast.makeText(this, "item 2 click", Toast.LENGTH_LONG).show();
-                return true;
-            case R.id.item3:
-                Toast.makeText(this, "item 3 click", Toast.LENGTH_LONG).show();
-                return true;
-            case R.id.item4:
-                Toast.makeText(this, "item 4 click", Toast.LENGTH_LONG).show();
-                return true;
-            default:
-                return false;
-        }
     }
 
 
-}
+
+//    public void retrievData(){
+//        listener = spinnerReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for(DataSnapshot snapshot1: snapshot.getChildren()) {
+//                    spinerData.add(snapshot1.getValue().toString());
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
+
+

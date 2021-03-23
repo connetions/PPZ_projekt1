@@ -4,7 +4,7 @@
     <string name="add_btn">Add</string>
 
 
-<!--Add Profile-->
+    <!--Add Profile-->
     <string name="taskView">Zadanie</string>
     <string name="taskEdit">...</string>
     <string name="dateView">Wybrana data</string>
