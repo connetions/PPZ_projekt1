@@ -6,7 +6,7 @@
     android:background="@drawable/bc_app"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddActivity">
+    tools:context=".EditActivity">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_right"
@@ -137,7 +137,6 @@
         android:id="@+id/deleteButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
-
         android:layout_marginBottom="4dp"
         android:background="@drawable/bc_btn_add"
         android:fontFamily="@font/oxygen_bold"
