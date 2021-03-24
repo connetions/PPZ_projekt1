@@ -9,9 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
@@ -32,9 +36,14 @@ public class EditActivity extends AppCompatActivity {
     private TextView dateView , timeView;
     EditText taskEdit, categoryEdit;
     Button updateButton, deleteButton, dateButton, timeButton;
-    DatabaseReference reference;
-
+    DatabaseReference reference,spinnerReference;
     Context mContext = this;
+
+    Spinner spinner;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> spinerData;
+    ValueEventListener listener;
+    String categoryName ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +62,7 @@ public class EditActivity extends AppCompatActivity {
         timeView.setText(getIntent().getStringExtra("timeTask"));
         dateView.setText(getIntent().getStringExtra("dateTask"));
         categoryEdit.setText(getIntent().getStringExtra("categoryTask"));
+        categoryName = getIntent().getStringExtra("categoryTask");
 
         final String keykeyDoes = getIntent().getStringExtra("keyTask");
         final String keykeyID = getIntent().getStringExtra("userID");
@@ -68,13 +78,13 @@ public class EditActivity extends AppCompatActivity {
                         snapshot.getRef().child("titleTask").setValue(taskEdit.getText().toString());
                         snapshot.getRef().child("dateTask").setValue(dateView.getText());
                         snapshot.getRef().child("timeTask").setValue(timeView.getText());
-                        snapshot.getRef().child("categoryTask").setValue(timeView.getText().toString());
+                        snapshot.getRef().child("categoryTask").setValue(categoryEdit.getText().toString());
 
                         Intent backToProfile = new Intent(EditActivity.this, ProfileActivity.class);
+                        backToProfile.putExtra("categoryTask", categoryName);
                         startActivity(backToProfile);
-
+//                        finish();
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
 
@@ -119,7 +129,7 @@ public class EditActivity extends AppCompatActivity {
                 datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        String date = "Month / Day / YEAR:" + month + "/" + dayOfMonth + "/" + year;
+                        String date = month + "/" + dayOfMonth + "/" + year;
                         dateView.setText(date);
                     }
                 },year,month,day);
@@ -140,6 +150,40 @@ public class EditActivity extends AppCompatActivity {
                     }
                 },hour, minute,true);
                 timePickerDialog.show();
+            }
+        });
+
+        spinner=findViewById(R.id.categorySpinner);
+        spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + keykeyID);
+        spinerData = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(EditActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
+
+        listener = spinnerReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot snapshot1: snapshot.getChildren()) {
+                    spinerData.add(snapshot1.getKey());
+                }
+                adapter = new ArrayAdapter<String>(EditActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
+                spinner.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                categoryEdit.setText(categoryName);
+                categoryName = parent.getItemAtPosition(position).toString();
+
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
     }

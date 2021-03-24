@@ -2,18 +2,19 @@ package com.example.todolist;
 
 public class MyDoes {
 
-    String titleTask, dateTask, timeTask, keyTask,userID,categoryTask;
+    String titleTask, dateTask, timeTask, keyTask,userID,categoryTask,lastCategoryTask;
 
     public MyDoes() {
     }
 
-    public MyDoes(String titleTask, String dateTask, String timeTask, String keyTask, String userID,String categoryTask) {
+    public MyDoes(String titleTask, String dateTask, String timeTask, String keyTask, String userID,String categoryTask, String lastCategoryTask) {
         this.titleTask = titleTask;
         this.dateTask = dateTask;
         this.timeTask = timeTask;
         this.keyTask = keyTask;
         this.userID = userID;
         this.categoryTask = categoryTask;
+        this.lastCategoryTask = lastCategoryTask;
     }
 
     public String getCategoryTask() {
@@ -62,5 +63,13 @@ public class MyDoes {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public String getLastCategoryTask() {
+        return lastCategoryTask;
+    }
+
+    public void setLastCategoryTask(String lastCategoryTask) {
+        this.lastCategoryTask = lastCategoryTask;
     }
 }

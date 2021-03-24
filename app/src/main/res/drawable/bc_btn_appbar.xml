@@ -2,9 +2,9 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <stroke android:color="@color/yellow_green_crayola" android:width="2dp"/>
-            <solid android:color="@color/quinacridone_magenta"/>
-            <corners android:radius="180dp"/>
+<!--            <stroke android:color="@color/yellow_green_crayola" android:width="2dp"/>-->
+            <solid android:color="@color/sonic_silver"/>
+            <corners android:radius="5dp"/>
         </shape>
 
     </item>

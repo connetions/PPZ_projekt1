@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,7 +50,7 @@ public class ProfileActivity extends AppCompatActivity  {
     ArrayAdapter<String> adapter;
     ArrayList<String> spinerData;
     ValueEventListener listener;
-    String categoryName = "Wszystkie";
+    String categoryName;
 
     public String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -60,8 +61,8 @@ public class ProfileActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        spinner=findViewById(R.id.categorySpinner);
 
+        spinner=findViewById(R.id.categorySpinner);
         spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
         spinerData = new ArrayList<>();
         adapter = new ArrayAdapter<String>(ProfileActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
@@ -78,22 +79,20 @@ public class ProfileActivity extends AppCompatActivity  {
                 }
                 adapter = new ArrayAdapter<String>(ProfileActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
                 spinner.setAdapter(adapter);
-
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                
-                categoryName = parent.getItemAtPosition(position).toString();
 
+
+
+                categoryName = parent.getItemAtPosition(position).toString();
+//               categoryName = getIntent().getStringExtra("categoryTask");
                 fetchData();
 
             }
@@ -105,8 +104,6 @@ public class ProfileActivity extends AppCompatActivity  {
         });
 
 
-
-
 //      Przycisk przejscia do dodawania taskow
         addButton = findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +111,7 @@ public class ProfileActivity extends AppCompatActivity  {
             public void onClick(View v) {
                 Intent goToAdd = new Intent(ProfileActivity.this,AddActivity.class);
                 goToAdd.putExtra("keyID", userID);
+                goToAdd.putExtra("categoryTask", categoryName);
                 startActivity(goToAdd);
             }
         });
@@ -123,7 +121,9 @@ public class ProfileActivity extends AppCompatActivity  {
 
         userView = findViewById(R.id.userView);
         if (firebaseUser != null){
-            userView.setText(firebaseUser.getDisplayName());
+            String userFullName = firebaseUser.getDisplayName();
+            String[] userName = userFullName.split(" ");
+            userView.setText("Witaj " + userName[0]);
         }
 
         googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
@@ -136,11 +136,12 @@ public class ProfileActivity extends AppCompatActivity  {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            Intent backToMain = new Intent(ProfileActivity.this,MainActivity.class);
-                            startActivity(backToMain);
+
                             firebaseAuth.signOut();
                             Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
-                            finish();
+//                            finish();
+                            Intent backToMain = new Intent(ProfileActivity.this,MainActivity.class);
+                            startActivity(backToMain);
 
                         }
                     }

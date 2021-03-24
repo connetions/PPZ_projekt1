@@ -20,24 +20,42 @@
         android:id="@+id/userView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:fontFamily="@font/nunito_extrabold"
         android:gravity="center_horizontal"
         android:textAlignment="center"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/includeAppBar"
         app:layout_constraintEnd_toStartOf="@+id/logoutButton"
         app:layout_constraintStart_toEndOf="@+id/categorySpinner"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
+    <ImageView
+        android:id="@+id/happyDayView"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/milego_dnia"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userView" />
+
     <Button
         android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
         android:background="@drawable/bc_btn_appbar"
+        android:fontFamily="@font/cabin_bold_italic"
         android:text="@string/logout_btn"
-        app:layout_constraintBottom_toBottomOf="@+id/includeAppBar"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@+id/includeAppBar"
         app:layout_constraintTop_toTopOf="@+id/includeAppBar"
         tools:ignore="MissingConstraints" />
@@ -46,12 +64,12 @@
     <Spinner
         android:id="@+id/categorySpinner"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
-        android:spinnerMode="dropdown"
+        android:layout_marginTop="4dp"
         android:background="@drawable/bc_spinner"
-        app:layout_constraintBottom_toBottomOf="@+id/includeAppBar"
+        android:spinnerMode="dropdown"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/includeAppBar" />
 

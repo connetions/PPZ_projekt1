@@ -24,4 +24,14 @@
     <color name="tyrian_purple">#501537</color>
     <color name="rusian_violet">#3C1B43</color>
 
+<!--GrayGold-->
+    <color name="heliotrape_gray">#9a8f97</color>
+    <color name="sonic_silver">#736f72</color>
+    <color name="cyber_yellow">#ffd400</color>
+    <color name="jet">#736f72</color>
+    <color name="space_cadest">#1d3461</color>
+    <color name="deep_space_sparkles">#3a606e</color>
+    <color name="milk">#C4C6B9</color>
+
+
 </resources>
