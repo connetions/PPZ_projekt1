@@ -25,7 +25,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class MainActivity extends AppCompatActivity {
-    //KOMENTARZ XDD
     SignInButton btSignIn;
     GoogleSignInClient googleSignInClient;
     FirebaseAuth firebaseAuth;
@@ -51,14 +50,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //initialize sign in intent
                 Intent intent = googleSignInClient.getSignInIntent();
-                //start activity for result
                 startActivityForResult(intent, 100);
             }
         }));
 
         //initialize firebase auth
         firebaseAuth = FirebaseAuth.getInstance();
-
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
         if (firebaseUser != null){

@@ -1,5 +1,6 @@
 package com.example.todolist;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -43,6 +44,7 @@ public class DoesAdapter extends RecyclerView.Adapter<DoesAdapter.MyViewHolder> 
         return new MyViewHolder(LayoutInflater.from(context).inflate(R.layout.item_does, parent, false));
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
@@ -59,15 +61,14 @@ public class DoesAdapter extends RecyclerView.Adapter<DoesAdapter.MyViewHolder> 
         final String getUserID = myDoes.get(position).getUserID();
         final String getCategoryTask = myDoes.get(position).getCategoryTask();
 
+
         if(getCategoryTask.equals("Ukonczone")) {
             holder.taskCategory.setText("Kategoria: " + myDoes.get(position).getLastCategoryTask());
         }
 
-
         reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + getUserID).child(getCategoryTask).child("Does" + getKeyTask);
         spinnerFinish = FirebaseDatabase.getInstance().getReference().child("ToDo" + getUserID).child("Ukonczone").child("Does" + getKeyTask);
         holder.finishButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 if(!getCategoryTask.equals("Ukonczone")) {
@@ -88,16 +89,19 @@ public class DoesAdapter extends RecyclerView.Adapter<DoesAdapter.MyViewHolder> 
                         }
                     });
                 }
-                reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(context.getApplicationContext(), "Usuniete", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                Intent refresh = new Intent(context, ProfileActivity.class);
-                context.startActivity(refresh);
+                
+//                reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        Toast.makeText(context.getApplicationContext(), "Usuniete", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//                Intent refresh = new Intent(context, ProfileActivity.class);
+//                context.startActivity(refresh);
+
             }
         });
+
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +124,7 @@ public class DoesAdapter extends RecyclerView.Adapter<DoesAdapter.MyViewHolder> 
         return myDoes.size();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder{
+    static class MyViewHolder extends RecyclerView.ViewHolder{
 
         TextView taskTitle, taskDate, taskTime,taskCategory;
         Button finishButton;

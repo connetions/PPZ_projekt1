@@ -2,11 +2,18 @@ package com.example.todolist;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -101,6 +108,7 @@ public class AddActivity extends AppCompatActivity  {
 
 //        time picker okodowany
         timeButton = findViewById(R.id.timeButton);
+
         timeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,9 +150,9 @@ public class AddActivity extends AppCompatActivity  {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                categoryEdit.setText(categoryName);
-                categoryName = parent.getItemAtPosition(position).toString();
 
+                categoryName = parent.getItemAtPosition(position).toString();
+                categoryEdit.setText(categoryName);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -175,8 +183,33 @@ public class AddActivity extends AppCompatActivity  {
                         }
                     });
 
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                        NotificationChannel channel = new NotificationChannel("My","My", NotificationManager.IMPORTANCE_DEFAULT);
+                        NotificationManager manager = getSystemService(NotificationManager.class);
+                        manager.createNotificationChannel(channel);
+                    }
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(AddActivity.this, "My")
+                            .setSmallIcon(android.R.drawable.ic_dialog_info)
+                            .setContentTitle("I'ts time")
+                            .setContentText("XDDDD")
+                            .setAutoCancel(true);
+
+                    Intent intent = new Intent(AddActivity.this, ProfileActivity.class);
+
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                    PendingIntent pendingIntent = PendingIntent.getActivity(AddActivity.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+                    builder.setContentIntent(pendingIntent);
+
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AddActivity.this);
+                    notificationManager.notify(1,builder.build());
+
+                    String[] hourTime = timeView.getText().toString().split(":");
+                    int hhour = Integer.parseInt(hourTime[0]);
+                    int mminute = Integer.parseInt(hourTime[1]);
+
                     Intent backToProfile = new Intent(AddActivity.this, ProfileActivity.class);
-                    backToProfile.putExtra("categoryTask", categoryName);
                     startActivity(backToProfile);
 //                finish();
                 }

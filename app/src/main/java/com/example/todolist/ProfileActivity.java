@@ -36,8 +36,8 @@ import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity  {
 
-    TextView userView;
-    Button logoutButton, addButton;
+    TextView userView;  //Imie uzytkownika
+    Button logoutButton, addButton; // Guzik wylogowania i dodawania
     FirebaseAuth firebaseAuth;
     GoogleSignInClient googleSignInClient;
 
@@ -66,11 +66,6 @@ public class ProfileActivity extends AppCompatActivity  {
         spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
         spinerData = new ArrayList<>();
         adapter = new ArrayAdapter<String>(ProfileActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
-
-//        spinner.setAdapter(adapter);
-//        retrievData();
-
-
         listener = spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -85,26 +80,21 @@ public class ProfileActivity extends AppCompatActivity  {
             }
         });
 
+
+//        Wybranie kategori i zaladowanie danych
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-
-
                 categoryName = parent.getItemAtPosition(position).toString();
-//               categoryName = getIntent().getStringExtra("categoryTask");
                 fetchData();
-
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
 
-//      Przycisk przejscia do dodawania taskow
+//      Przejscie do dodawania taskow
         addButton = findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,9 +106,10 @@ public class ProfileActivity extends AppCompatActivity  {
             }
         });
 
+
+//        Wyswietlanie aktualnego uzytkownika
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-
         userView = findViewById(R.id.userView);
         if (firebaseUser != null){
             String userFullName = firebaseUser.getDisplayName();
@@ -126,8 +117,9 @@ public class ProfileActivity extends AppCompatActivity  {
             userView.setText("Witaj " + userName[0]);
         }
 
+
+//        Wylogowywanie sie
         googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
-//        wylogowywanie sie
         logoutButton = findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,10 +128,8 @@ public class ProfileActivity extends AppCompatActivity  {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-
                             firebaseAuth.signOut();
                             Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
-//                            finish();
                             Intent backToMain = new Intent(ProfileActivity.this,MainActivity.class);
                             startActivity(backToMain);
 
@@ -151,6 +141,8 @@ public class ProfileActivity extends AppCompatActivity  {
 
 
     }
+
+    // Funkcja do pobierania danych z bazy
     public void fetchData(){
         ourdoes = findViewById(R.id.ourdoes);
         ourdoes.setLayoutManager(new LinearLayoutManager(this));
@@ -183,23 +175,5 @@ public class ProfileActivity extends AppCompatActivity  {
 
     }
 
-
-
-//    public void retrievData(){
-//        listener = spinnerReference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for(DataSnapshot snapshot1: snapshot.getChildren()) {
-//                    spinerData.add(snapshot1.getValue().toString());
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 
 

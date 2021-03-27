@@ -83,7 +83,7 @@ public class EditActivity extends AppCompatActivity {
                         Intent backToProfile = new Intent(EditActivity.this, ProfileActivity.class);
                         backToProfile.putExtra("categoryTask", categoryName);
                         startActivity(backToProfile);
-//                        finish();
+
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
