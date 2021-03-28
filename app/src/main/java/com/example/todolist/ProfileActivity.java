@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -34,26 +35,25 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity  {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
 
-    TextView userView;  //Imie uzytkownika
-    Button logoutButton, addButton; // Guzik wylogowania i dodawania
-    FirebaseAuth firebaseAuth;
-    GoogleSignInClient googleSignInClient;
+    private TextView textViewUser;
+    private Button buttonLogout, buttonAdd;
+    private FirebaseAuth firebaseAuth;
+    private GoogleSignInClient googleSignInClient;
 
-    DatabaseReference reference, spinnerReference;
-    RecyclerView ourdoes;
-    ArrayList<MyDoes> list;
-    DoesAdapter doesAdapter;
+    private DatabaseReference reference, spinnerReference;
+    private RecyclerView recyclerViewTask;
+    private ArrayList<MyDoes> list;
+    private DoesAdapter doesAdapter;
+    private FirebaseUser firebaseUser;
+    private Spinner spinnerCategory;
+    private ArrayList<String> spinnerData;
 
-    Spinner spinner;
-    ArrayAdapter<String> adapter;
-    ArrayList<String> spinerData;
-    ValueEventListener listener;
+    private ArrayAdapter<String> spinnerDataAdapter;
+
     String categoryName;
-
-    public String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
+    String userID;
 
 
     @Override
@@ -61,107 +61,78 @@ public class ProfileActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
-        spinner=findViewById(R.id.categorySpinner);
+        String userFullName = firebaseUser.getDisplayName();
+        userID = firebaseUser.getUid();
+
+        spinnerCategory = findViewById(R.id.spinnerCategory);
+        fetchSpinnerData();
+        spinnerDataAdapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_dropdown_item, spinnerData);
+        spinnerCategory.setAdapter(spinnerDataAdapter);
+
+//        Wybranie kategori i zaladowanie danych
+        spinnerCategory.setOnItemSelectedListener(this);
+
+//      Przejscie do dodawania taskow
+        buttonAdd = findViewById(R.id.buttonAdd);
+        buttonAdd.setOnClickListener(this);
+
+//      Wyswietlanie aktualnego uzytkownika
+        setUserName(userFullName);
+
+//      Wylogowywanie sie
+        buttonLogout = findViewById(R.id.buttonLogout);
+        buttonLogout.setOnClickListener(this);
+    }
+
+
+    private void fetchSpinnerData(){
+        spinnerData = new ArrayList<>();
         spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
-        spinerData = new ArrayList<>();
-        adapter = new ArrayAdapter<String>(ProfileActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
-        listener = spinnerReference.addValueEventListener(new ValueEventListener() {
+        spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot snapshot1: snapshot.getChildren()) {
-                    spinerData.add(snapshot1.getKey());
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    spinnerData.add(snapshot1.getKey());
                 }
-                adapter = new ArrayAdapter<String>(ProfileActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
-                spinner.setAdapter(adapter);
+                spinnerDataAdapter.notifyDataSetChanged();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
-
-//        Wybranie kategori i zaladowanie danych
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                categoryName = parent.getItemAtPosition(position).toString();
-                fetchData();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-
-//      Przejscie do dodawania taskow
-        addButton = findViewById(R.id.addButton);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToAdd = new Intent(ProfileActivity.this,AddActivity.class);
-                goToAdd.putExtra("keyID", userID);
-                goToAdd.putExtra("categoryTask", categoryName);
-                startActivity(goToAdd);
-            }
-        });
-
-
-//        Wyswietlanie aktualnego uzytkownika
-        firebaseAuth = FirebaseAuth.getInstance();
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        userView = findViewById(R.id.userView);
-        if (firebaseUser != null){
-            String userFullName = firebaseUser.getDisplayName();
-            String[] userName = userFullName.split(" ");
-            userView.setText("Witaj " + userName[0]);
-        }
-
-
-//        Wylogowywanie sie
-        googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
-        logoutButton = findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            firebaseAuth.signOut();
-                            Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
-                            Intent backToMain = new Intent(ProfileActivity.this,MainActivity.class);
-                            startActivity(backToMain);
-
-                        }
-                    }
-                });
-            }
-        });
-
-
     }
 
+    private void setUserName(String userFullName) {
+        textViewUser = findViewById(R.id.textViewUser);
+        if (firebaseUser != null) {
+            String[] userName = userFullName.split(" ");
+            textViewUser.setText("Witaj " + userName[0]);
+        }
+    }
+
+
     // Funkcja do pobierania danych z bazy
-    public void fetchData(){
-        ourdoes = findViewById(R.id.ourdoes);
-        ourdoes.setLayoutManager(new LinearLayoutManager(this));
-        ourdoes.setHasFixedSize(true);
+    public void fetchData() {
+        recyclerViewTask = findViewById(R.id.recyclerViewTask);
+        recyclerViewTask.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewTask.setHasFixedSize(true);
         list = new ArrayList<MyDoes>();
 
         //get data from base
-
-        reference = FirebaseDatabase.getInstance().getReference().child("ToDo"+userID).child(categoryName);
+        reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(categoryName);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren())
-                {
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     MyDoes p = dataSnapshot1.getValue(MyDoes.class);
                     list.add(p);
                 }
                 doesAdapter = new DoesAdapter(ProfileActivity.this, list);
-                ourdoes.setAdapter(doesAdapter);
+                recyclerViewTask.setAdapter(doesAdapter);
                 doesAdapter.notifyDataSetChanged();
             }
 
@@ -173,7 +144,48 @@ public class ProfileActivity extends AppCompatActivity  {
     }
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.buttonLogout:
+                googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
+                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            firebaseAuth.signOut();
+                            Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
+                            Intent backToMain = new Intent(ProfileActivity.this, MainActivity.class);
+                            startActivity(backToMain);
+                        }
+                    }
+                });
+                break;
+
+            case R.id.buttonAdd:
+                Intent goToAdd = new Intent(ProfileActivity.this, AddActivity.class);
+                goToAdd.putExtra("keyID", userID);
+                goToAdd.putExtra("categoryTask", categoryName);
+                startActivity(goToAdd);
+                break;
+        }
     }
 
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        switch (parent.getId()){
+            case R.id.spinnerCategory:
+                categoryName = parent.getItemAtPosition(position).toString();
+                fetchData();
+                break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+}

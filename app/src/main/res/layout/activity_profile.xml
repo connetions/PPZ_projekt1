@@ -13,40 +13,41 @@
 
     <include
         android:id="@+id/includeAppBar"
-        layout="@layout/appbar" />
-
+        layout="@layout/appbar"
+        tools:layout_editor_absoluteX="137dp"
+        tools:layout_editor_absoluteY="-5dp" />
 
     <TextView
-        android:id="@+id/userView"
+        android:id="@+id/textViewUser"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="9dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
         android:fontFamily="@font/nunito_extrabold"
         android:gravity="center_horizontal"
         android:textAlignment="center"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/logoutButton"
-        app:layout_constraintStart_toEndOf="@+id/categorySpinner"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLogout"
+        app:layout_constraintStart_toEndOf="@+id/spinnerCategory"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
     <ImageView
-        android:id="@+id/happyDayView"
+        android:id="@+id/imageViewHappyDay"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="15dp"
         android:src="@drawable/milego_dnia"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userView" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewUser" />
 
     <Button
-        android:id="@+id/logoutButton"
+        android:id="@+id/buttonLogout"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:layout_marginTop="4dp"
@@ -62,7 +63,7 @@
 
 
     <Spinner
-        android:id="@+id/categorySpinner"
+        android:id="@+id/spinnerCategory"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:layout_marginStart="4dp"
@@ -75,7 +76,7 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/ourdoes"
+        android:id="@+id/recyclerViewTask"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -89,7 +90,7 @@
         tools:ignore="MissingConstraints" />
 
     <Button
-        android:id="@+id/addButton"
+        android:id="@+id/buttonAdd"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginEnd="4dp"
