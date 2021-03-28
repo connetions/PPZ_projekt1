@@ -9,7 +9,7 @@
     tools:context=".MainActivity">
 
     <com.google.android.gms.common.SignInButton
-        android:id="@+id/Google_Sign_Button"
+        android:id="@+id/signInButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
