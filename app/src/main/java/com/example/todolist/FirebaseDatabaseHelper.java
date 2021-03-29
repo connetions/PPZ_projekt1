@@ -34,8 +34,6 @@ public class FirebaseDatabaseHelper {
         void DataIsDeleted();
     }
 
-
-
     public FirebaseDatabaseHelper(String taskCategory) {
 
         mDatabase = FirebaseDatabase.getInstance();

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,13 +16,28 @@
         tools:layout_editor_absoluteX="137dp"
         tools:layout_editor_absoluteY="-5dp" />
 
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:background="@null"
+        android:onClick="showPopup"
+        android:src="@drawable/ic_sharp_menu_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/includeAppBar"
+        tools:ignore="MissingConstraints" />
+
     <TextView
         android:id="@+id/textViewUser"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="9dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:fontFamily="@font/nunito_extrabold"
@@ -31,35 +45,37 @@
         android:textAlignment="center"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/buttonLogout"
+        app:layout_constraintEnd_toStartOf="@+id/imageButton"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/spinnerCategory"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
     <ImageView
         android:id="@+id/imageViewHappyDay"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="66dp"
         android:layout_marginTop="15dp"
         android:src="@drawable/milego_dnia"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewUser" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewUser"
+        />
 
-    <Button
-        android:id="@+id/buttonLogout"
-        android:layout_width="100dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
-        android:background="@drawable/bc_btn_appbar"
-        android:fontFamily="@font/cabin_bold_italic"
-        android:text="@string/logout_btn"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@+id/includeAppBar"
-        app:layout_constraintTop_toTopOf="@+id/includeAppBar"
-        tools:ignore="MissingConstraints" />
+<!--    <Button-->
+<!--        android:id="@+id/buttonLogout"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="40dp"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:layout_marginEnd="4dp"-->
+<!--        android:layout_marginRight="4dp"-->
+<!--        android:background="@drawable/bc_btn_appbar"-->
+<!--        android:fontFamily="@font/cabin_bold_italic"-->
+<!--        android:text="@string/logout_btn"-->
+<!--        android:textSize="20sp"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/includeAppBar"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/includeAppBar"-->
+<!--        tools:ignore="MissingConstraints" />-->
 
 
     <Spinner
@@ -69,7 +85,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
-        android:background="@drawable/bc_spinner"
+        android:background="@null"
         android:spinnerMode="dropdown"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/includeAppBar" />
@@ -100,8 +116,6 @@
         android:text="@string/add_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

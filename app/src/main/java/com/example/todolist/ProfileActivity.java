@@ -2,13 +2,11 @@ package com.example.todolist;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,7 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener, PopupMenu.OnMenuItemClickListener {
 
     private TextView textViewUser;
     private Button buttonLogout, buttonAdd;
@@ -81,12 +79,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         setUserName(userFullName);
 
 //      Wylogowywanie sie
-        buttonLogout = findViewById(R.id.buttonLogout);
-        buttonLogout.setOnClickListener(this);
+//        buttonLogout = findViewById(R.id.buttonLogout);
+//        buttonLogout.setOnClickListener(this);
 
         mRecyclerView = findViewById(R.id.recyclerViewTask);
 
     }
+
+    public void showPopup(View v){
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.setOnMenuItemClickListener(this);
+        popup.inflate(R.menu.menu_menu);
+        popup.show();
+    }
+
 
     private void fetchSpinnerData(){
         spinnerData = new ArrayList<>();
@@ -117,20 +123,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.buttonLogout:
-                googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
-                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            firebaseAuth.signOut();
-                            Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
-                            Intent backToMain = new Intent(ProfileActivity.this, MainActivity.class);
-                            startActivity(backToMain);
-                        }
-                    }
-                });
-                break;
+//            case R.id.buttonLogout:
+//                googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
+//                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//                            firebaseAuth.signOut();
+//                            Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
+//                            Intent backToMain = new Intent(ProfileActivity.this, MainActivity.class);
+//                            startActivity(backToMain);
+//                        }
+//                    }
+//                });
+//                break;
 
             case R.id.buttonAdd:
                 Intent goToAdd = new Intent(ProfileActivity.this, AddActivity.class);
@@ -178,5 +184,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
+    }
+
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.logout:
+                Toast.makeText(this, "LLLLLL", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.about:
+                Toast.makeText(this, "sda", Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        return false;
     }
 }

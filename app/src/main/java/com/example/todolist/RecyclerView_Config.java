@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,7 +31,11 @@ public class RecyclerView_Config {
         private TextView mTitle, mTime, mDate, mCategory;
 
         private String key;
-        private  String userID;
+        private String userID;
+        private String title;
+        private String date;
+        private String time;
+        private String category;
 
         public TaskItemView(ViewGroup parent){
             super(LayoutInflater.from(mContext).inflate(R.layout.task_list_item, parent, false));
@@ -54,6 +59,67 @@ public class RecyclerView_Config {
                     return false;
                 }
             });
+            
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Task task = new Task();
+                    task.setTitleTask(title);
+                    task.setDateTask(date);
+                    task.setTimeTask(time);
+                    task.setCategoryTask("Ukonczone");
+                    task.setUserID(userID);
+                    task.setKeyTask(key);
+                    if (!category.equals("Ukonczone")){
+                        new FirebaseDatabaseHelper("Ukonczone").addTask(task, new FirebaseDatabaseHelper.DataStatus() {
+                            @Override
+                            public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+
+                            }
+
+                            @Override
+                            public void DataIsInserted() {
+
+
+                            }
+
+                            @Override
+                            public void DataIsUpdated() {
+
+                            }
+
+                            @Override
+                            public void DataIsDeleted() {
+
+                            }
+                        });
+
+                        new FirebaseDatabaseHelper(category).deleteTask(key, new FirebaseDatabaseHelper.DataStatus() {
+                            @Override
+                            public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+
+                            }
+
+                            @Override
+                            public void DataIsInserted() {
+
+                            }
+
+                            @Override
+                            public void DataIsUpdated() {
+
+                            }
+
+                            @Override
+                            public void DataIsDeleted() {
+                                Toast.makeText(mContext, "Finish", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+
+                }
+            });
         }
 
         public void bind(Task task, String key, String userID) {
@@ -63,6 +129,10 @@ public class RecyclerView_Config {
             mCategory.setText(task.getCategoryTask());
             this.key = key;
             this.userID = userID;
+            this.title = task.getTitleTask();
+            this.date = task.getDateTask();
+            this.time = task.getTimeTask();
+            this.category = task.getCategoryTask();
         }
     }
 

@@ -52,8 +52,6 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     final int month = calendar.get(Calendar.MONTH);
     final int year = calendar.get(Calendar.YEAR);
 
-    private String keykeyID;
-
     private String key;
     private String title;
     private String date;
@@ -83,13 +81,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         textViewDate.setText(date);
         editTextCategory.setText(category);
 //
-//        categoryName = getIntent().getStringExtra("categoryTask");
 //
-//        final String keykeyDoes = getIntent().getStringExtra("keyTask");
-//        keykeyID = getIntent().getStringExtra("userID");
-
-
-
         buttonUpdate = findViewById(R.id.buttonUpdate);
         buttonUpdate.setOnClickListener(this);
 
@@ -111,8 +103,6 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         spinnerCategory.setAdapter(spinnerDataAdapter);
 
         spinnerCategory.setOnItemSelectedListener(this);
-
-
 
     }
 
