@@ -34,18 +34,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
-public class AddActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener{
+public class AddActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
 
     private TextView textViewDate , textViewTime;
     private EditText editTextTask, editTextCategory;
     private Button buttonAdd, buttonDate, buttonTime;
-    private DatabaseReference reference,spinnerReference;
-//    String doesID = new ProfileActivity().userID;
+    private DatabaseReference spinnerReference;
     private Spinner spinnerCategory;
-    private ArrayAdapter<String> spinnerAdapterCategory;
-    private ArrayList<String> spinerData;
+    private ArrayAdapter<String> spinnerDataAdapter;
+    private ArrayList<String> spinnerData;
 
     String categoryName;
 
@@ -60,6 +60,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
     final int year = calendar.get(Calendar.YEAR);
 
     private String userID;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,17 +82,13 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 
         buttonTime.setOnClickListener(this);
 
-//        Dodawanie do bazy
-
         userID = getIntent().getStringExtra("keyID");
         categoryName =  getIntent().getStringExtra("categoryTask");
-        spinnerCategory=findViewById(R.id.spinnerCategory);
+
+        spinnerCategory = findViewById(R.id.spinnerCategory);
         fetchSpinnerData();
-
-        spinnerAdapterCategory = new ArrayAdapter<String>(AddActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
-        spinnerCategory.setAdapter(spinnerAdapterCategory);
-
-
+        spinnerDataAdapter = new ArrayAdapter<String>(AddActivity.this, android.R.layout.simple_spinner_dropdown_item, spinnerData);
+        spinnerCategory.setAdapter(spinnerDataAdapter);
         spinnerCategory.setOnItemSelectedListener(this);
 
         buttonAdd = findViewById(R.id.buttonAdd);
@@ -99,46 +96,77 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void fetchSpinnerData(){
-        spinerData = new ArrayList<>();
+        spinnerData = new ArrayList<>();
         spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
         spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot snapshot1: snapshot.getChildren()) {
-                    spinerData.add(snapshot1.getKey());
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    spinnerData.add(snapshot1.getKey());
                 }
-
-                spinnerAdapterCategory.notifyDataSetInvalidated();
+                spinnerDataAdapter.notifyDataSetChanged();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
-
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.buttonAdd:
-                //nazwa bazki + ID usera i podrzewa does + losowy numer taska
-                reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(editTextCategory.getText().toString()).child("Does" + keyTask);
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                Task task = new Task();
+                task.setTitleTask(editTextTask.getText().toString());
+                task.setDateTask(textViewDate.getText().toString());
+                task.setTimeTask(textViewTime.getText().toString());
+                task.setCategoryTask(editTextCategory.getText().toString());
+                task.setUserID(userID);
+                task.setKeyTask(keyTask);
+
+                new FirebaseDatabaseHelper(editTextCategory.getText().toString()).addTask(task, new FirebaseDatabaseHelper.DataStatus() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.getRef().child("titleTask").setValue(editTextTask.getText().toString());
-                        snapshot.getRef().child("dateTask").setValue(textViewDate.getText());
-                        snapshot.getRef().child("timeTask").setValue(textViewTime.getText());
-                        snapshot.getRef().child("categoryTask").setValue(editTextCategory.getText().toString());
-                        snapshot.getRef().child("keyTask").setValue(keyTask);
-                        snapshot.getRef().child("userID").setValue(userID);
+                    public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void DataIsInserted() {
+                        Toast.makeText(mContext, "Suscces", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void DataIsUpdated() {
+
+                    }
+
+                    @Override
+                    public void DataIsDeleted() {
+
                     }
                 });
+
+
+
+                //nazwa bazki + ID usera i podrzewa does + losowy numer taska
+//                reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(editTextCategory.getText().toString()).child("Does" + keyTask);
+//                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        snapshot.getRef().child("titleTask").setValue(editTextTask.getText().toString());
+//                        snapshot.getRef().child("dateTask").setValue(textViewDate.getText());
+//                        snapshot.getRef().child("timeTask").setValue(textViewTime.getText());
+//                        snapshot.getRef().child("categoryTask").setValue(editTextCategory.getText().toString());
+//                        snapshot.getRef().child("keyTask").setValue(keyTask);
+//                        snapshot.getRef().child("userID").setValue(userID);
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//                    }
+//                });
 
 //                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 //                    NotificationChannel channel = new NotificationChannel("My","My", NotificationManager.IMPORTANCE_DEFAULT);
@@ -166,8 +194,8 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 //                int hhour = Integer.parseInt(hourTime[0]);
 //                int mminute = Integer.parseInt(hourTime[1]);
 
-                Intent backToProfile = new Intent(AddActivity.this, ProfileActivity.class);
-                startActivity(backToProfile);
+//                Intent backToProfile = new Intent(AddActivity.this, ProfileActivity.class);
+//                startActivity(backToProfile);
                 break;
 
             case R.id.buttonDate:
@@ -194,11 +222,17 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
+
+
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        categoryName = parent.getItemAtPosition(position).toString();
-        editTextCategory.setText(categoryName);
-
+        switch (parent.getId()) {
+            case R.id.spinnerCategory:
+                categoryName = parent.getItemAtPosition(position).toString();
+                editTextCategory.setText(categoryName);
+                break;
+        }
     }
 
     @Override

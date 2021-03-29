@@ -1,7 +1,11 @@
 package com.example.todolist;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,12 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseDatabaseHelper {
+
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReferenceTasks;
     private FirebaseAuth firebaseAuth;
     private List<Task> tasks = new ArrayList<>();
-
     private String userID;
+
+
+
 
     public interface DataStatus{
         void DataIsLoaded(List<Task> tasks, List<String> keys);
@@ -27,10 +34,14 @@ public class FirebaseDatabaseHelper {
         void DataIsDeleted();
     }
 
-    public FirebaseDatabaseHelper() {
+
+
+    public FirebaseDatabaseHelper(String taskCategory) {
+
         mDatabase = FirebaseDatabase.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
-        mReferenceTasks = mDatabase.getReference().child("ToDo" + userID);
+        mReferenceTasks = mDatabase.getReference().child("ToDo" + userID).child(taskCategory);
     }
 
     public void readTasks(final DataStatus dataStatus){
@@ -53,4 +64,33 @@ public class FirebaseDatabaseHelper {
             }
         });
     }
+
+    public void addTask(Task task, final DataStatus dataStatus){
+        String key = mReferenceTasks.push().getKey(); // mozna dodac w inicie swoj
+        mReferenceTasks.child(key).setValue(task).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                dataStatus.DataIsInserted();
+            }
+        });
+    }
+
+    public void updateTask(String key, Task task, final DataStatus dataStatus){
+        mReferenceTasks.child(key).setValue(task).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                dataStatus.DataIsUpdated();
+            }
+        });
+    }
+
+    public void deleteTask(String key, final DataStatus dataStatus){
+        mReferenceTasks.child(key).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                dataStatus.DataIsDeleted();
+            }
+        });
+    }
+
 }

@@ -42,18 +42,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseAuth firebaseAuth;
     private GoogleSignInClient googleSignInClient;
 
-    private DatabaseReference reference, spinnerReference;
-    private RecyclerView recyclerViewTask;
-    private ArrayList<MyDoes> list;
-    private DoesAdapter doesAdapter;
+    private DatabaseReference  spinnerReference;
+
     private FirebaseUser firebaseUser;
 
     private Spinner spinnerCategory;
     private ArrayList<String> spinnerData;
-
     private ArrayAdapter<String> spinnerDataAdapter;
 
-    public String categoryName;
+    public String categoryName ;
     String userID;
 
 
@@ -74,8 +71,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         fetchSpinnerData();
         spinnerDataAdapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_dropdown_item, spinnerData);
         spinnerCategory.setAdapter(spinnerDataAdapter);
-
-//      Wybranie kategori i zaladowanie danych
         spinnerCategory.setOnItemSelectedListener(this);
 
 //      Przejscie do dodawania taskow
@@ -90,27 +85,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         buttonLogout.setOnClickListener(this);
 
         mRecyclerView = findViewById(R.id.recyclerViewTask);
-        new FirebaseDatabaseHelper().readTasks(new FirebaseDatabaseHelper.DataStatus() {
-            @Override
-            public void DataIsLoaded(List<com.example.todolist.Task> tasks, List<String> keys) {
-                new RecyclerView_Config().setConfig(mRecyclerView, ProfileActivity.this, tasks, keys);
-            }
 
-            @Override
-            public void DataIsInserted() {
-
-            }
-
-            @Override
-            public void DataIsUpdated() {
-
-            }
-
-            @Override
-            public void DataIsDeleted() {
-
-            }
-        });
     }
 
     private void fetchSpinnerData(){
@@ -119,12 +94,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                spinnerData.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     spinnerData.add(snapshot1.getKey());
                 }
                 spinnerDataAdapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
@@ -137,34 +112,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             String[] userName = userFullName.split(" ");
             textViewUser.setText("Witaj " + userName[0]);
         }
-    }
-
-
-    public void fetchData() {
-        recyclerViewTask = findViewById(R.id.recyclerViewTask);
-        recyclerViewTask.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewTask.setHasFixedSize(true);
-        list = new ArrayList<MyDoes>();
-
-        //get data from base
-        reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(categoryName);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    MyDoes p = dataSnapshot1.getValue(MyDoes.class);
-                    list.add(p);
-                }
-                doesAdapter = new DoesAdapter(ProfileActivity.this, list);
-                recyclerViewTask.setAdapter(doesAdapter);
-                doesAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "No Data", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override
@@ -196,11 +143,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
         switch (parent.getId()){
             case R.id.spinnerCategory:
                 categoryName = parent.getItemAtPosition(position).toString();
-//                fetchData();
+                fetchData();
                 break;
         }
     }
@@ -208,5 +154,29 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    public void fetchData(){
+        new FirebaseDatabaseHelper(categoryName).readTasks(new FirebaseDatabaseHelper.DataStatus() {
+            @Override
+            public void DataIsLoaded(List<com.example.todolist.Task> tasks, List<String> keys) {
+                new RecyclerView_Config().setConfig(mRecyclerView, ProfileActivity.this, tasks, keys, userID);
+            }
+
+            @Override
+            public void DataIsInserted() {
+
+            }
+
+            @Override
+            public void DataIsUpdated() {
+
+            }
+
+            @Override
+            public void DataIsDeleted() {
+
+            }
+        });
     }
 }

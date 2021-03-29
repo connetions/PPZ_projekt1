@@ -20,7 +20,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
 public class EditActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
@@ -36,7 +36,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     private TextView textViewTime, textViewDate;
     EditText editTextTask, editTextCategory;
     private Button buttonUpdate, buttonDelete, buttonDate, buttonTime;
-    DatabaseReference reference, spinnerReference;
+    DatabaseReference  spinnerReference;
     Context mContext = this;
 
     Spinner spinnerCategory;
@@ -54,27 +54,40 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
 
     private String keykeyID;
 
+    private String key;
+    private String title;
+    private String date;
+    private String time;
+    private String category;
+    private String userID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+
+        key = getIntent().getStringExtra("key");
+        title = getIntent().getStringExtra("title");
+        date = getIntent().getStringExtra("date");
+        time = getIntent().getStringExtra("time");
+        category = getIntent().getStringExtra("category");
+
+        userID = getIntent().getStringExtra("userID");
 
         textViewDate = findViewById(R.id.textViewDate);
         textViewTime = findViewById(R.id.textViewTime);
         editTextTask = findViewById(R.id.editTextTask);
         editTextCategory = findViewById(R.id.editTextCategory);
 
-        editTextTask.setText(getIntent().getStringExtra("titleTask"));
-        textViewTime.setText(getIntent().getStringExtra("timeTask"));
-        textViewDate.setText(getIntent().getStringExtra("dateTask"));
-        editTextCategory.setText(getIntent().getStringExtra("categoryTask"));
+        editTextTask.setText(title);
+        textViewTime.setText(time);
+        textViewDate.setText(date);
+        editTextCategory.setText(category);
+//
+//        categoryName = getIntent().getStringExtra("categoryTask");
+//
+//        final String keykeyDoes = getIntent().getStringExtra("keyTask");
+//        keykeyID = getIntent().getStringExtra("userID");
 
-        categoryName = getIntent().getStringExtra("categoryTask");
-
-        final String keykeyDoes = getIntent().getStringExtra("keyTask");
-        keykeyID = getIntent().getStringExtra("userID");
-
-        reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + keykeyID).child(getIntent().getStringExtra("categoryTask")).child("Does" + keykeyDoes);
 
 
         buttonUpdate = findViewById(R.id.buttonUpdate);
@@ -83,11 +96,11 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         buttonDelete = findViewById(R.id.buttonDelete);
         buttonDelete.setOnClickListener(this);
 
-        // datePicker okodowany
+
         buttonDate = findViewById(R.id.buttonDate);
         buttonDate.setOnClickListener(this);
 
-//        time picker okodowany
+
         buttonTime = findViewById(R.id.buttonTime);
         buttonTime.setOnClickListener(this);
 
@@ -100,13 +113,13 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         spinnerCategory.setOnItemSelectedListener(this);
 
 
-        spinnerCategory.setOnItemSelectedListener(this);
+
     }
 
 
     private void fetchSpinnerData() {
         spinerData = new ArrayList<>();
-        spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + keykeyID);
+        spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
         spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -126,38 +139,62 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonUpdate:
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.getRef().child("titleTask").setValue(editTextTask.getText().toString());
-                        snapshot.getRef().child("dateTask").setValue(textViewDate.getText());
-                        snapshot.getRef().child("timeTask").setValue(textViewTime.getText());
-                        snapshot.getRef().child("categoryTask").setValue(editTextCategory.getText().toString());
+                Task task = new Task();
+                task.setTitleTask(editTextTask.getText().toString());
+                task.setDateTask(textViewDate.getText().toString());
+                task.setTimeTask(textViewTime.getText().toString());
+                task.setCategoryTask(editTextCategory.getText().toString());
+//                task.setUserID(userID);
+//                task.setKeyTask(keyTask);
 
-                        Intent backToProfile = new Intent(EditActivity.this, ProfileActivity.class);
-                        backToProfile.putExtra("categoryTask", categoryName);
-                        startActivity(backToProfile);
+                new FirebaseDatabaseHelper(category).updateTask(key, task, new FirebaseDatabaseHelper.DataStatus() {
+                    @Override
+                    public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+                        
+                    }
+
+                    @Override
+                    public void DataIsInserted() {
 
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void DataIsUpdated() {
+                        Toast.makeText(mContext, "Update", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void DataIsDeleted() {
 
                     }
                 });
+
+                finish();
                 break;
+
             case R.id.buttonDelete:
-                reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Intent goToProfile = new Intent(EditActivity.this, ProfileActivity.class);
-                            startActivity(goToProfile);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                    new FirebaseDatabaseHelper(category).deleteTask(key, new FirebaseDatabaseHelper.DataStatus() {
+                        @Override
+                        public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+                            
                         }
-                    }
-                });
+
+                        @Override
+                        public void DataIsInserted() {
+
+                        }
+
+                        @Override
+                        public void DataIsUpdated() {
+
+                        }
+
+                        @Override
+                        public void DataIsDeleted() {
+                            Toast.makeText(mContext, "Delete", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                finish();
                 break;
             case R.id.buttonDate:
                 DatePickerDialog datePickerDialog;
