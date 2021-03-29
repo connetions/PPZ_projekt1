@@ -42,7 +42,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     Spinner spinnerCategory;
     ArrayAdapter<String> spinnerDataAdapter;
     ArrayList<String> spinerData;
-    ValueEventListener listener;
+
     String categoryName;
 
     Calendar calendar = Calendar.getInstance();

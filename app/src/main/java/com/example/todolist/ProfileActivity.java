@@ -47,14 +47,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private ArrayList<MyDoes> list;
     private DoesAdapter doesAdapter;
     private FirebaseUser firebaseUser;
+
     private Spinner spinnerCategory;
     private ArrayList<String> spinnerData;
 
     private ArrayAdapter<String> spinnerDataAdapter;
 
-    String categoryName;
+    public String categoryName;
     String userID;
 
+
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         spinnerDataAdapter = new ArrayAdapter<String>(ProfileActivity.this, android.R.layout.simple_spinner_dropdown_item, spinnerData);
         spinnerCategory.setAdapter(spinnerDataAdapter);
 
-//        Wybranie kategori i zaladowanie danych
+//      Wybranie kategori i zaladowanie danych
         spinnerCategory.setOnItemSelectedListener(this);
 
 //      Przejscie do dodawania taskow
@@ -85,8 +88,30 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 //      Wylogowywanie sie
         buttonLogout = findViewById(R.id.buttonLogout);
         buttonLogout.setOnClickListener(this);
-    }
 
+        mRecyclerView = findViewById(R.id.recyclerViewTask);
+        new FirebaseDatabaseHelper().readTasks(new FirebaseDatabaseHelper.DataStatus() {
+            @Override
+            public void DataIsLoaded(List<com.example.todolist.Task> tasks, List<String> keys) {
+                new RecyclerView_Config().setConfig(mRecyclerView, ProfileActivity.this, tasks, keys);
+            }
+
+            @Override
+            public void DataIsInserted() {
+
+            }
+
+            @Override
+            public void DataIsUpdated() {
+
+            }
+
+            @Override
+            public void DataIsDeleted() {
+
+            }
+        });
+    }
 
     private void fetchSpinnerData(){
         spinnerData = new ArrayList<>();
@@ -115,7 +140,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    // Funkcja do pobierania danych z bazy
     public void fetchData() {
         recyclerViewTask = findViewById(R.id.recyclerViewTask);
         recyclerViewTask.setLayoutManager(new LinearLayoutManager(this));
@@ -142,7 +166,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
-
 
     @Override
     public void onClick(View v) {
@@ -171,15 +194,13 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         switch (parent.getId()){
             case R.id.spinnerCategory:
                 categoryName = parent.getItemAtPosition(position).toString();
-                fetchData();
+//                fetchData();
                 break;
         }
     }

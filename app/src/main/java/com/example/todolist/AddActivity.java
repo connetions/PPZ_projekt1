@@ -36,110 +36,79 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
-public class AddActivity extends AppCompatActivity  {
+public class AddActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener{
 
-    TextView dateView , timeView;
-    EditText taskEdit, categoryEdit;
-    Button addButton, dateButton, timeButton;
-    DatabaseReference reference,spinnerReference;
+    private TextView textViewDate , textViewTime;
+    private EditText editTextTask, editTextCategory;
+    private Button buttonAdd, buttonDate, buttonTime;
+    private DatabaseReference reference,spinnerReference;
 //    String doesID = new ProfileActivity().userID;
-    Spinner spinner;
-    ArrayAdapter<String> adapter;
-    ArrayList<String> spinerData;
-    ValueEventListener listener;
+    private Spinner spinnerCategory;
+    private ArrayAdapter<String> spinnerAdapterCategory;
+    private ArrayList<String> spinerData;
+
     String categoryName;
 
     Context mContext = this;
     String keyTask = Integer.toString(new Random().nextInt());
+
+    Calendar calendar = Calendar.getInstance();
+    final int hour = calendar.get(Calendar.HOUR_OF_DAY);
+    final int minute = calendar.get(Calendar.MINUTE);
+    final int day = calendar.get(Calendar.DAY_OF_MONTH);
+    final int month = calendar.get(Calendar.MONTH) ;
+    final int year = calendar.get(Calendar.YEAR);
+
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
 
-        dateView = findViewById(R.id.dateView);
-        timeView = findViewById(R.id.timeView);
-        taskEdit = findViewById(R.id.taskEdit);
-        categoryEdit = findViewById(R.id.categoryEdit);
+        textViewDate = findViewById(R.id.textViewDate);
+        textViewTime = findViewById(R.id.textViewTime);
+        editTextTask = findViewById(R.id.editTextTask);
+        editTextCategory = findViewById(R.id.editTextCategory);
 
-//      Inicjalizowanie zmiennych do kalendarza i czasu
-        Calendar calendar = Calendar.getInstance();
-        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        final int minute = calendar.get(Calendar.MINUTE);
-        final int day = calendar.get(Calendar.DAY_OF_MONTH);
-        final int month = calendar.get(Calendar.MONTH) ;
-        final int year = calendar.get(Calendar.YEAR);
-
-
-
-        taskEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ("...".equals(taskEdit.getText().toString()) ){
-                    taskEdit.setText("");
-                }
-            }
-        });
-
-        categoryEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ("Podaj kategorie".equals(categoryEdit.getText().toString()) ){
-                    categoryEdit.setText("");
-                }
-            }
-        });
+//
         // datePicker okodowany
-        dateButton = findViewById(R.id.dateButton);
-        dateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog;
-                datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        String date =  month + 1 + "/" + dayOfMonth + "/" + year;
-                        dateView.setText(date);
-                    }
-                },year,month,day);
-                datePickerDialog.show();
-            }
-        });
+        buttonDate = findViewById(R.id.buttonDate);
+        buttonDate.setOnClickListener(this);
 
 //        time picker okodowany
-        timeButton = findViewById(R.id.timeButton);
+        buttonTime = findViewById(R.id.buttonTime);
 
-        timeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog timePickerDialog;
-                timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        timeView.setText((hourOfDay + ":" + minute));
-                    }
-                },hour, minute,true);
-                timePickerDialog.show();
-            }
-        });
+        buttonTime.setOnClickListener(this);
 
 //        Dodawanie do bazy
 
-        final String userID = getIntent().getStringExtra("keyID");
+        userID = getIntent().getStringExtra("keyID");
         categoryName =  getIntent().getStringExtra("categoryTask");
-        spinner=findViewById(R.id.categorySpinner);
-        spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
-        spinerData = new ArrayList<>();
-        adapter = new ArrayAdapter<String>(AddActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
+        spinnerCategory=findViewById(R.id.spinnerCategory);
+        fetchSpinnerData();
 
-        listener = spinnerReference.addValueEventListener(new ValueEventListener() {
+        spinnerAdapterCategory = new ArrayAdapter<String>(AddActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
+        spinnerCategory.setAdapter(spinnerAdapterCategory);
+
+
+        spinnerCategory.setOnItemSelectedListener(this);
+
+        buttonAdd = findViewById(R.id.buttonAdd);
+        buttonAdd.setOnClickListener(this);
+    }
+
+    private void fetchSpinnerData(){
+        spinerData = new ArrayList<>();
+        spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
+        spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot snapshot1: snapshot.getChildren()) {
                     spinerData.add(snapshot1.getKey());
                 }
-                adapter = new ArrayAdapter<String>(AddActivity.this,android.R.layout.simple_spinner_dropdown_item,spinerData);
-                spinner.setAdapter(adapter);
+
+                spinnerAdapterCategory.notifyDataSetInvalidated();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -147,101 +116,93 @@ public class AddActivity extends AppCompatActivity  {
             }
         });
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                categoryName = parent.getItemAtPosition(position).toString();
-                categoryEdit.setText(categoryName);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        addButton = findViewById(R.id.addButton);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(data_checker()){
-//                nazwa bazki + ID usera i podrzewa does + losowy numer taska
-                    reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(categoryEdit.getText().toString()).child("Does" + keyTask);
-                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            snapshot.getRef().child("titleTask").setValue(taskEdit.getText().toString());
-                            snapshot.getRef().child("dateTask").setValue(dateView.getText());
-                            snapshot.getRef().child("timeTask").setValue(timeView.getText());
-                            snapshot.getRef().child("categoryTask").setValue(categoryEdit.getText().toString());
-                            snapshot.getRef().child("keyTask").setValue(keyTask);
-                            snapshot.getRef().child("userID").setValue(userID);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                        }
-                    });
-
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                        NotificationChannel channel = new NotificationChannel("My","My", NotificationManager.IMPORTANCE_DEFAULT);
-                        NotificationManager manager = getSystemService(NotificationManager.class);
-                        manager.createNotificationChannel(channel);
-                    }
-
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(AddActivity.this, "My")
-                            .setSmallIcon(android.R.drawable.ic_dialog_info)
-                            .setContentTitle("I'ts time")
-                            .setContentText("XDDDD")
-                            .setAutoCancel(true);
-
-                    Intent intent = new Intent(AddActivity.this, ProfileActivity.class);
-
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                    PendingIntent pendingIntent = PendingIntent.getActivity(AddActivity.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-                    builder.setContentIntent(pendingIntent);
-
-                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AddActivity.this);
-                    notificationManager.notify(1,builder.build());
-
-                    String[] hourTime = timeView.getText().toString().split(":");
-                    int hhour = Integer.parseInt(hourTime[0]);
-                    int mminute = Integer.parseInt(hourTime[1]);
-
-                    Intent backToProfile = new Intent(AddActivity.this, ProfileActivity.class);
-                    startActivity(backToProfile);
-//                finish();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(),"Złe dane", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.buttonAdd:
+                //nazwa bazki + ID usera i podrzewa does + losowy numer taska
+                reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(editTextCategory.getText().toString()).child("Does" + keyTask);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().child("titleTask").setValue(editTextTask.getText().toString());
+                        snapshot.getRef().child("dateTask").setValue(textViewDate.getText());
+                        snapshot.getRef().child("timeTask").setValue(textViewTime.getText());
+                        snapshot.getRef().child("categoryTask").setValue(editTextCategory.getText().toString());
+                        snapshot.getRef().child("keyTask").setValue(keyTask);
+                        snapshot.getRef().child("userID").setValue(userID);
+                    }
 
-    boolean data_checker(){
-        int cnt = 0;
-        if (taskEdit.getText().toString().equals("...")) {
-            cnt++;
-        }
-        if (dateView.getText().toString().equals("Wybrana data")) {
-            cnt++;
-        }
-        if (timeView.getText().toString().equals("Wybrana godzina")){
-            cnt++;
-        }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
 
-        if (categoryEdit.getText().toString().equals("Podaj kategorie")){
-            cnt++;
-        }
+//                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+//                    NotificationChannel channel = new NotificationChannel("My","My", NotificationManager.IMPORTANCE_DEFAULT);
+//                    NotificationManager manager = getSystemService(NotificationManager.class);
+//                    manager.createNotificationChannel(channel);
+//                }
+//
+//                NotificationCompat.Builder builder = new NotificationCompat.Builder(AddActivity.this, "My")
+//                        .setSmallIcon(android.R.drawable.ic_dialog_info)
+//                        .setContentTitle("I'ts time")
+//                        .setContentText("XDDDD")
+//                        .setAutoCancel(true);
+//
+//                Intent intent = new Intent(AddActivity.this, ProfileActivity.class);
+//
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//
+//                PendingIntent pendingIntent = PendingIntent.getActivity(AddActivity.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+//                builder.setContentIntent(pendingIntent);
+//
+//                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AddActivity.this);
+//                notificationManager.notify(1,builder.build());
+//
+//                String[] hourTime = textViewTime.getText().toString().split(":");
+//                int hhour = Integer.parseInt(hourTime[0]);
+//                int mminute = Integer.parseInt(hourTime[1]);
 
-        if (cnt == 0){
-            return true;
-        }
+                Intent backToProfile = new Intent(AddActivity.this, ProfileActivity.class);
+                startActivity(backToProfile);
+                break;
 
-        return false;
-        }
+            case R.id.buttonDate:
+                DatePickerDialog datePickerDialog;
+                datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        String date =  month + 1 + "/" + dayOfMonth + "/" + year;
+                        textViewDate.setText(date);
+                    }
+                },year,month,day);
+                datePickerDialog.show();
+                break;
 
+            case R.id.buttonTime:
+                TimePickerDialog timePickerDialog;
+                timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        textViewTime.setText((hourOfDay + ":" + minute));
+                    }
+                },hour, minute,true);
+                timePickerDialog.show();
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        categoryName = parent.getItemAtPosition(position).toString();
+        editTextCategory.setText(categoryName);
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }

@@ -13,4 +13,5 @@
     <string name="timeButton">Godzina</string>
     <string name="termView">Termin</string>
     <string name="buttonAddTask">+</string>
+    <string name="editTextCategory">Podaj kategorie</string>
 </resources>

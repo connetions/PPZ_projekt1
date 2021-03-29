@@ -71,33 +71,29 @@ public class DoesAdapter extends RecyclerView.Adapter<DoesAdapter.MyViewHolder> 
         holder.finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!getCategoryTask.equals("Ukonczone")) {
-                    spinnerFinish.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            snapshot.getRef().child("titleTask").setValue(getTitleTask);
-                            snapshot.getRef().child("dateTask").setValue(getDateTask);
-                            snapshot.getRef().child("timeTask").setValue(getTimeTask);
-                            snapshot.getRef().child("categoryTask").setValue("Ukonczone");
-                            snapshot.getRef().child("lastCategoryTask").setValue(getCategoryTask);
-                            snapshot.getRef().child("keyTask").setValue(getKeyTask);
-                            snapshot.getRef().child("userID").setValue(getUserID);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                        }
-                    });
-                }
+//                if(!getCategoryTask.equals("Ukonczone")) {
+//                    spinnerFinish.addListenerForSingleValueEvent(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                            snapshot.getRef().child("titleTask").setValue(getTitleTask);
+//                            snapshot.getRef().child("dateTask").setValue(getDateTask);
+//                            snapshot.getRef().child("timeTask").setValue(getTimeTask);
+//                            snapshot.getRef().child("categoryTask").setValue("Ukonczone");
+//                            snapshot.getRef().child("lastCategoryTask").setValue(getCategoryTask);
+//                            snapshot.getRef().child("keyTask").setValue(getKeyTask);
+//                            snapshot.getRef().child("userID").setValue(getUserID);
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError error) {
+//                        }
+//                    });
+//                }
                 
-//                reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        Toast.makeText(context.getApplicationContext(), "Usuniete", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+                reference.removeValue();
 //                Intent refresh = new Intent(context, ProfileActivity.class);
 //                context.startActivity(refresh);
+//                notifyDataSetChanged();
 
             }
         });
