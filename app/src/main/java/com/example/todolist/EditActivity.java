@@ -8,6 +8,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -58,6 +59,8 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     private String time;
     private String category;
     private String userID;
+
+    public int index;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,31 +100,36 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         buttonTime.setOnClickListener(this);
 
         spinnerCategory = findViewById(R.id.spinnerCategory);
+
         fetchSpinnerData();
 
-        spinnerDataAdapter = new ArrayAdapter<String>(EditActivity.this, android.R.layout.simple_spinner_dropdown_item, spinerData);
+        spinnerDataAdapter = new ArrayAdapter<String>(EditActivity.this, android.R.layout.simple_spinner_dropdown_item,spinerData);
         spinnerCategory.setAdapter(spinnerDataAdapter);
-
         spinnerCategory.setOnItemSelectedListener(this);
 
     }
 
 
-    private void fetchSpinnerData() {
-        spinerData = new ArrayList<>();
+    public void fetchSpinnerData() {
+        spinerData = new ArrayList<String>();
         spinnerReference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID);
+
         spinnerReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    spinerData.add(snapshot1.getKey());
+                    spinerData.add(snapshot1.getKey().toString());
+
                 }
+                getIndexSpinnerItem(spinerData, category);
                 spinnerDataAdapter.notifyDataSetChanged();
+                spinnerCategory.setSelection(index);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
+
         });
     }
 
@@ -186,6 +194,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                     });
                 finish();
                 break;
+
             case R.id.buttonDate:
                 DatePickerDialog datePickerDialog;
                 datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
@@ -215,8 +224,8 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         switch (parent.getId()) {
             case R.id.spinnerCategory:
-                editTextCategory.setText(categoryName);
                 categoryName = parent.getItemAtPosition(position).toString();
+                editTextCategory.setText(categoryName);
                 break;
         }
     }
@@ -225,4 +234,18 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+    public void getIndexSpinnerItem(ArrayList<String> spinner, String item){
+
+        for (int i = 0; i < spinner.size(); i++){
+            if(spinner.get(i).equals(item)){
+                index = i;
+
+                break;
+            }
+        }
+
+
+    }
+
 }

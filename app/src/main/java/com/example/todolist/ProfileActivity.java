@@ -62,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
 
+        assert firebaseUser != null;
         String userFullName = firebaseUser.getDisplayName();
         userID = firebaseUser.getUid();
 
@@ -71,16 +72,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         spinnerCategory.setAdapter(spinnerDataAdapter);
         spinnerCategory.setOnItemSelectedListener(this);
 
-//      Przejscie do dodawania taskow
+
         buttonAdd = findViewById(R.id.buttonAdd);
         buttonAdd.setOnClickListener(this);
 
-//      Wyswietlanie aktualnego uzytkownika
+
         setUserName(userFullName);
 
-//      Wylogowywanie sie
-//        buttonLogout = findViewById(R.id.buttonLogout);
-//        buttonLogout.setOnClickListener(this);
+
 
         mRecyclerView = findViewById(R.id.recyclerViewTask);
 
@@ -123,20 +122,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-//            case R.id.buttonLogout:
-//                googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
-//                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()) {
-//                            firebaseAuth.signOut();
-//                            Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
-//                            Intent backToMain = new Intent(ProfileActivity.this, MainActivity.class);
-//                            startActivity(backToMain);
-//                        }
-//                    }
-//                });
-//                break;
+//
 
             case R.id.buttonAdd:
                 Intent goToAdd = new Intent(ProfileActivity.this, AddActivity.class);
@@ -191,7 +177,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()){
             case R.id.logout:
-                Toast.makeText(this, "LLLLLL", Toast.LENGTH_SHORT).show();
+                googleSignInClient = GoogleSignIn.getClient(ProfileActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
+                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            firebaseAuth.signOut();
+                            Toast.makeText(getApplicationContext(), "Logout", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                });
                 return true;
 
             case R.id.about:

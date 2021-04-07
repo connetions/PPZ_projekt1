@@ -62,22 +62,6 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewUser"
         />
 
-<!--    <Button-->
-<!--        android:id="@+id/buttonLogout"-->
-<!--        android:layout_width="100dp"-->
-<!--        android:layout_height="40dp"-->
-<!--        android:layout_marginTop="4dp"-->
-<!--        android:layout_marginEnd="4dp"-->
-<!--        android:layout_marginRight="4dp"-->
-<!--        android:background="@drawable/bc_btn_appbar"-->
-<!--        android:fontFamily="@font/cabin_bold_italic"-->
-<!--        android:text="@string/logout_btn"-->
-<!--        android:textSize="20sp"-->
-<!--        app:layout_constraintEnd_toEndOf="@+id/includeAppBar"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/includeAppBar"-->
-<!--        tools:ignore="MissingConstraints" />-->
-
-
     <Spinner
         android:id="@+id/spinnerCategory"
         android:layout_width="100dp"

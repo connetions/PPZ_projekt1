@@ -32,8 +32,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -134,7 +136,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
                     @Override
                     public void DataIsInserted() {
                         Toast.makeText(mContext, "Suscces", Toast.LENGTH_SHORT).show();
-                        finish();
+
                     }
 
                     @Override
@@ -147,27 +149,22 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 
                     }
                 });
+                createNotificationChanel();
+                Intent intent = new Intent(AddActivity.this, ReminderBroadcast.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(AddActivity.this,0,intent,0);
+
+                AlarmManager alarmManager =(AlarmManager) getSystemService(ALARM_SERVICE);
+                long timeAtButtonClick = System.currentTimeMillis();
+
+                long timedDiff = timeCalculate(textViewTime.getText().toString());
+                Toast.makeText(mContext, Long.toString(timedDiff), Toast.LENGTH_SHORT).show();
+
+                alarmManager.set(AlarmManager.RTC_WAKEUP,timeAtButtonClick + timedDiff, pendingIntent);
 
 
 
-                //nazwa bazki + ID usera i podrzewa does + losowy numer taska
-//                reference = FirebaseDatabase.getInstance().getReference().child("ToDo" + userID).child(editTextCategory.getText().toString()).child("Does" + keyTask);
-//                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        snapshot.getRef().child("titleTask").setValue(editTextTask.getText().toString());
-//                        snapshot.getRef().child("dateTask").setValue(textViewDate.getText());
-//                        snapshot.getRef().child("timeTask").setValue(textViewTime.getText());
-//                        snapshot.getRef().child("categoryTask").setValue(editTextCategory.getText().toString());
-//                        snapshot.getRef().child("keyTask").setValue(keyTask);
-//                        snapshot.getRef().child("userID").setValue(userID);
-//                    }
+
 //
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//                    }
-//                });
-
 //                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 //                    NotificationChannel channel = new NotificationChannel("My","My", NotificationManager.IMPORTANCE_DEFAULT);
 //                    NotificationManager manager = getSystemService(NotificationManager.class);
@@ -194,8 +191,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 //                int hhour = Integer.parseInt(hourTime[0]);
 //                int mminute = Integer.parseInt(hourTime[1]);
 
-//                Intent backToProfile = new Intent(AddActivity.this, ProfileActivity.class);
-//                startActivity(backToProfile);
+                finish();
                 break;
 
             case R.id.buttonDate:
@@ -223,8 +219,6 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
     }
 
 
-
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         switch (parent.getId()) {
@@ -238,5 +232,40 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    private void createNotificationChanel(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            String name = "CO TAM";
+            String desc = "XDDD";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("notifyLemubit", name, importance);
+            channel.setDescription(desc);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+    }
+
+    private long timeCalculate( String time){
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+
+        Calendar now = Calendar.getInstance();
+        int currentHour = now.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = now.get(Calendar.MINUTE);
+        int currentSecond = now.get(Calendar.SECOND);
+        String currentTime = Integer.toString(currentHour) + ":" + Integer.toString(currentMinute) + ":" + Integer.toString(currentSecond);
+        long diffTime = 0;
+        try {
+            Date taskTime = format.parse(time+":00");
+            Date ctime = format.parse(currentTime);
+            diffTime = taskTime.getTime() - ctime.getTime();
+            return diffTime;
+        }
+        catch (Exception e){
+
+        }
+        return diffTime;
     }
 }
