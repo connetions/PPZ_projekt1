@@ -161,10 +161,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 
                 alarmManager.set(AlarmManager.RTC_WAKEUP,timeAtButtonClick + timedDiff, pendingIntent);
 
-
-
-
-//
+                
 //                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 //                    NotificationChannel channel = new NotificationChannel("My","My", NotificationManager.IMPORTANCE_DEFAULT);
 //                    NotificationManager manager = getSystemService(NotificationManager.class);
