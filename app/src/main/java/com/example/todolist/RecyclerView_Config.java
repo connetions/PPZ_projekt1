@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class RecyclerView_Config {
@@ -133,8 +136,66 @@ public class RecyclerView_Config {
             this.date = task.getDateTask();
             this.time = task.getTimeTask();
             this.category = task.getCategoryTask();
+            if(data_checker(task.getTimeTask(), task.getDateTask())){
+                mTitle.setTextColor(0xFF9F1C13);
+                mTime.setTextColor(0xFF9F1C13);
+                mDate.setTextColor(0xFF9F1C13);
+                mCategory.setTextColor(0xFF9F1C13);
+            }
         }
-    }
+
+
+
+
+
+        boolean data_checker(String time, String day) {
+            int cnt = 0;
+            Calendar now = Calendar.getInstance();
+            int currentHour = now.get(Calendar.HOUR_OF_DAY);
+            int currentMinute = now.get(Calendar.MINUTE);
+            int currentSecond = now.get(Calendar.SECOND);
+            int currentDay = now.get(Calendar.DAY_OF_MONTH);
+            int currentMonth = now.get(Calendar.MONTH);
+            int currentYear = now.get(Calendar.YEAR);
+
+
+
+            SimpleDateFormat format2 = new SimpleDateFormat("MM:dd:yyyy");
+
+            String currentDayy = Integer.toString(currentMonth + 1) + ":" + Integer.toString(currentDay ) + ":" + Integer.toString(currentYear);
+
+
+            try {
+
+                Date taskDay = format2.parse(day);
+                Date cday = format2.parse(currentDayy);
+                if (taskDay.getTime() <= cday.getTime()) {
+
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+                    String currentTime = Integer.toString(currentHour) + ":" + Integer.toString(currentMinute) + ":" + Integer.toString(currentSecond);
+                    try {
+                        Date taskTime = format.parse(time + ":00");
+                        Date ctime = format.parse(currentTime);
+                        if (taskTime.getTime() < ctime.getTime()) {
+                            return true;
+                        }
+
+                    } catch (Exception e) {
+
+                    }
+                }
+
+
+            } catch (Exception e) {
+
+            }
+
+
+
+            return false;
+            }
+        }
+
 
     class TasksAdapter extends  RecyclerView.Adapter<TaskItemView>{
         private List<Task> mTaskList;

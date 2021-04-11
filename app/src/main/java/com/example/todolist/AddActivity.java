@@ -119,49 +119,50 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
         switch (v.getId()){
             case R.id.buttonAdd:
 
-                Task task = new Task();
-                task.setTitleTask(editTextTask.getText().toString());
-                task.setDateTask(textViewDate.getText().toString());
-                task.setTimeTask(textViewTime.getText().toString());
-                task.setCategoryTask(editTextCategory.getText().toString());
-                task.setUserID(userID);
-                task.setKeyTask(keyTask);
+                if(data_checker(textViewTime.getText().toString(), textViewDate.getText().toString())) {
+                    Task task = new Task();
+                    task.setTitleTask(editTextTask.getText().toString());
+                    task.setDateTask(textViewDate.getText().toString());
+                    task.setTimeTask(textViewTime.getText().toString());
+                    task.setCategoryTask(editTextCategory.getText().toString());
+                    task.setUserID(userID);
+                    task.setKeyTask(keyTask);
 
-                new FirebaseDatabaseHelper(editTextCategory.getText().toString()).addTask(task, new FirebaseDatabaseHelper.DataStatus() {
-                    @Override
-                    public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+                    new FirebaseDatabaseHelper(editTextCategory.getText().toString()).addTask(task, new FirebaseDatabaseHelper.DataStatus() {
+                        @Override
+                        public void DataIsLoaded(List<Task> tasks, List<String> keys) {
 
-                    }
+                        }
 
-                    @Override
-                    public void DataIsInserted() {
-                        Toast.makeText(mContext, "Suscces", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void DataIsInserted() {
+                            Toast.makeText(mContext, "Suscces", Toast.LENGTH_SHORT).show();
 
-                    }
+                        }
 
-                    @Override
-                    public void DataIsUpdated() {
+                        @Override
+                        public void DataIsUpdated() {
 
-                    }
+                        }
 
-                    @Override
-                    public void DataIsDeleted() {
+                        @Override
+                        public void DataIsDeleted() {
 
-                    }
-                });
-                createNotificationChanel();
-                Intent intent = new Intent(AddActivity.this, ReminderBroadcast.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(AddActivity.this,0,intent,0);
+                        }
+                    });
+                    createNotificationChanel();
+                    Intent intent = new Intent(AddActivity.this, ReminderBroadcast.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(AddActivity.this, 0, intent, 0);
 
-                AlarmManager alarmManager =(AlarmManager) getSystemService(ALARM_SERVICE);
-                long timeAtButtonClick = System.currentTimeMillis();
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    long timeAtButtonClick = System.currentTimeMillis();
 
-                long timedDiff = timeCalculate(textViewTime.getText().toString());
-                Toast.makeText(mContext, Long.toString(timedDiff), Toast.LENGTH_SHORT).show();
+                    long timedDiff = timeCalculate(textViewTime.getText().toString());
+                    Toast.makeText(mContext, Long.toString(timedDiff), Toast.LENGTH_SHORT).show();
 
-                alarmManager.set(AlarmManager.RTC_WAKEUP,timeAtButtonClick + timedDiff, pendingIntent);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, timeAtButtonClick + timedDiff, pendingIntent);
 
-                
+
 //                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 //                    NotificationChannel channel = new NotificationChannel("My","My", NotificationManager.IMPORTANCE_DEFAULT);
 //                    NotificationManager manager = getSystemService(NotificationManager.class);
@@ -188,7 +189,11 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 //                int hhour = Integer.parseInt(hourTime[0]);
 //                int mminute = Integer.parseInt(hourTime[1]);
 
-                finish();
+                    finish();
+                }
+                else{
+                    Toast.makeText(this, "Podaj prawidlowe dane", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
             case R.id.buttonDate:
@@ -196,7 +201,7 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
                 datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        String date =  month + 1 + "/" + dayOfMonth + "/" + year;
+                        String date =  month + 1 + ":" + dayOfMonth + ":" + year;
                         textViewDate.setText(date);
                     }
                 },year,month,day);
@@ -264,5 +269,80 @@ public class AddActivity extends AppCompatActivity implements View.OnClickListen
 
         }
         return diffTime;
+    }
+
+
+    boolean data_checker(String time, String day){
+        int cnt = 0;
+        Calendar now = Calendar.getInstance();
+        int currentHour = now.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = now.get(Calendar.MINUTE);
+        int currentSecond = now.get(Calendar.SECOND);
+        int currentDay = now.get(Calendar.DAY_OF_MONTH);
+        int currentMonth = now.get(Calendar.MONTH);
+        int currentYear = now.get(Calendar.YEAR);
+
+
+
+
+        if (editTextTask.getText().toString().equals("")) {
+            cnt++;
+        }
+        if (textViewDate.getText().toString().equals("Wybrana data")) {
+            cnt++;
+        }
+        else{
+
+            SimpleDateFormat format2 = new SimpleDateFormat("MM:dd:yyyy");
+
+            String currentDayy = Integer.toString(currentMonth + 1)   + ":" + Integer.toString(currentDay -1)  + ":" + Integer.toString(currentYear);
+
+
+            try {
+
+                Date taskDay = format2.parse(day);
+                Date cday = format2.parse(currentDayy);
+                if (taskDay.getTime() <=  cday.getTime()){
+                    cnt++;
+                }
+
+
+            }
+            catch (Exception e){
+
+            }
+        }
+        if (textViewTime.getText().toString().equals("Wybrana godzina")){
+            cnt++;
+        }
+        else{
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+            String currentTime = Integer.toString(currentHour) + ":" + Integer.toString(currentMinute) + ":" + Integer.toString(currentSecond);
+            try {
+                Date taskTime = format.parse(time+":00");
+                Date ctime = format.parse(currentTime);
+                if (taskTime.getTime() <  ctime.getTime()){
+                    cnt++;
+                }
+
+            }
+            catch (Exception e){
+
+            }
+        }
+
+        if (editTextCategory.getText().toString().equals("")){
+            cnt++;
+        }
+
+        if (editTextCategory.getText().toString().equals("Ukonczone")){
+            cnt++;
+        }
+
+        if (cnt == 0){
+            return true;
+        }
+
+        return false;
     }
 }
