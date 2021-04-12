@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ToDoList">
-        <activity android:name=".EditActivity"></activity>
+        <activity android:name=".dodajWiele"></activity>
+        <activity android:name=".EditActivity" />
         <activity android:name=".AddActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".MainActivity">
@@ -21,7 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".ReminderBroadcast"></receiver>
+
+        <receiver android:name=".ReminderBroadcast" />
 
         <meta-data
             android:name="preloaded_fonts"

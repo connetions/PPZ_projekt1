@@ -6,6 +6,6 @@
         android:id="@+id/logout"
         android:title="@string/logout_btn" />
     <item
-        android:id="@+id/about"
-        android:title="about" />
+        android:id="@+id/wieleZadan"
+        android:title="Dodaj wiele" />
 </menu>

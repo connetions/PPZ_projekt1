@@ -183,6 +183,7 @@ public class RecyclerView_Config {
                     } catch (Exception e) {
 
                     }
+
                 }
 
 

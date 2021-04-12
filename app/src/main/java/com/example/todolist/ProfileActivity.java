@@ -190,8 +190,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 });
                 return true;
 
-            case R.id.about:
-                Toast.makeText(this, "sda", Toast.LENGTH_SHORT).show();
+            case R.id.wieleZadan:
+                Intent goToAdd = new Intent(ProfileActivity.this, dodajWiele.class);
+                goToAdd.putExtra("keyID", userID);
+                goToAdd.putExtra("categoryTask", categoryName);
+                startActivity(goToAdd);
                 return true;
         }
         return false;

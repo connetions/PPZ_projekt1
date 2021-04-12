@@ -18,8 +18,8 @@ public class ReminderBroadcast extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notifyLemubit")
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
-                .setContentTitle("XD")
-                .setContentText("NIEW IWME OCBN")
+                .setContentTitle("DoReminder")
+                .setContentText("Masz zadanie do wykonania")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
 
