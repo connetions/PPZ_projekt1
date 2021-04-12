@@ -144,29 +144,75 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                 task.setCategoryTask(editTextCategory.getText().toString());
 //                task.setUserID(userID);
 //                task.setKeyTask(keyTask);
+                if (!category.equals(editTextCategory.getText().toString())){
+                    new FirebaseDatabaseHelper(editTextCategory.getText().toString()).addTask(task, new FirebaseDatabaseHelper.DataStatus() {
+                        @Override
+                        public void DataIsLoaded(List<Task> tasks, List<String> keys) {
 
-                new FirebaseDatabaseHelper(category).updateTask(key, task, new FirebaseDatabaseHelper.DataStatus() {
-                    @Override
-                    public void DataIsLoaded(List<Task> tasks, List<String> keys) {
-                        
-                    }
+                        }
 
-                    @Override
-                    public void DataIsInserted() {
+                        @Override
+                        public void DataIsInserted() {
 
-                    }
 
-                    @Override
-                    public void DataIsUpdated() {
-                        Toast.makeText(mContext, "Update", Toast.LENGTH_SHORT).show();
-                    }
+                        }
 
-                    @Override
-                    public void DataIsDeleted() {
+                        @Override
+                        public void DataIsUpdated() {
 
-                    }
-                });
+                        }
 
+                        @Override
+                        public void DataIsDeleted() {
+
+                        }
+                    });
+
+                    new FirebaseDatabaseHelper(category).deleteTask(key, new FirebaseDatabaseHelper.DataStatus() {
+                        @Override
+                        public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+
+                        }
+
+                        @Override
+                        public void DataIsInserted() {
+
+                        }
+
+                        @Override
+                        public void DataIsUpdated() {
+
+                        }
+
+                        @Override
+                        public void DataIsDeleted() {
+                            Toast.makeText(mContext, "Finish", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                else {
+                    new FirebaseDatabaseHelper(category).updateTask(key, task, new FirebaseDatabaseHelper.DataStatus() {
+                        @Override
+                        public void DataIsLoaded(List<Task> tasks, List<String> keys) {
+
+                        }
+
+                        @Override
+                        public void DataIsInserted() {
+
+                        }
+
+                        @Override
+                        public void DataIsUpdated() {
+                            Toast.makeText(mContext, "Update", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void DataIsDeleted() {
+
+                        }
+                    });
+                }
                 finish();
                 break;
 
