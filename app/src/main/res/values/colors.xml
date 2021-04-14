@@ -17,14 +17,14 @@
     <color name="gray_hunt">#384651</color>
 
 
-<!--Random Color-->
+    <!--Random Color-->
     <color name="middle_green_yellow">#b8c480</color>
     <color name="yellow_green_crayola">#d4e79e</color>
     <color name="quinacridone_magenta">#922D50</color>
     <color name="tyrian_purple">#501537</color>
     <color name="rusian_violet">#3C1B43</color>
 
-<!--GrayGold-->
+    <!--GrayGold-->
     <color name="heliotrape_gray">#9a8f97</color>
     <color name="sonic_silver">#736f72</color>
     <color name="cyber_yellow">#ffd400</color>
@@ -32,6 +32,10 @@
     <color name="space_cadest">#1d3461</color>
     <color name="deep_space_sparkles">#3a606e</color>
     <color name="milk">#C4C6B9</color>
+    <color name="light_blue_50">#FFE1F5FE</color>
+    <color name="light_blue_200">#FF81D4FA</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
 
 
 </resources>

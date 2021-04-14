@@ -15,5 +15,7 @@
     <string name="buttonAddTask">+</string>
     <string name="editTextCategory">Podaj kategorie</string>
     <string name="dodajWiele">...</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
 
